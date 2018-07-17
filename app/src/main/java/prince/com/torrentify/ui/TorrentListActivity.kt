@@ -14,27 +14,24 @@ import prince.com.torrentify.model.Movie
 class TorrentListActivity : AppCompatActivity(), TorrentListContract.TorrentListView {
     override lateinit var presenter: TorrentListContract.TorrentListPresenter
 
-    private var mArrayList:ArrayList<Movie>?=null
-    private var mAdapter:TorrentAdapter?=null
+    private var mAdapter: TorrentAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_torrent_list)
 
         TorrentListPresenterImpl(this)
 
-//        mAdapter= TorrentAdapter(mArrayList,this)
-//
-//        rv_movies.setHasFixedSize(true)
-//        rv_movies.itemAnimator = DefaultItemAnimator()
-//        rv_movies.layoutManager = LinearLayoutManager(this)
-//        rv_movies.adapter=mAdapter
+        mAdapter = TorrentAdapter(this)
 
-    }
+        rv_movies.setHasFixedSize(true)
+        rv_movies.itemAnimator = DefaultItemAnimator()
+        rv_movies.layoutManager = LinearLayoutManager(this)
+        rv_movies.adapter = mAdapter
 
-    override fun onStart() {
-        super.onStart()
         presenter.subscribe()
+
     }
+
 
     override fun onDestroy() {
         presenter.unSubscribe()
@@ -43,17 +40,22 @@ class TorrentListActivity : AppCompatActivity(), TorrentListContract.TorrentList
 
     override fun showLoader(status: Boolean) {
         if (status) {
-            showPrimaryLoader()
+            showLoader()
         } else {
-            hidePrimaryLoader()
+            hideLoader()
         }
     }
 
-    private fun showPrimaryLoader() {
+
+    override fun addMovieData(movieList: MutableList<Movie>) {
+        mAdapter?.addData(movieList)
+    }
+
+    private fun showLoader() {
         layout_loading.visibility = VISIBLE
     }
 
-    private fun hidePrimaryLoader() {
+    private fun hideLoader() {
         layout_loading.visibility = GONE
     }
 

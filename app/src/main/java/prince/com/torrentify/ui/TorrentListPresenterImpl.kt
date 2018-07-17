@@ -4,6 +4,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import okhttp3.ResponseBody
+import org.json.JSONObject
+import prince.com.torrentify.model.Movie
 import prince.com.torrentify.network.NetworkClient
 
 
@@ -23,24 +26,45 @@ class TorrentListPresenterImpl(val view: TorrentListContract.TorrentListView)
     }
 
     override fun unSubscribe() {
-        compositeDisposable?.clear()
+        compositeDisposable?.dispose()
     }
 
     override fun getTorrentList() {
-        var subscriber = getSingle()
+        view.showLoader(true)
+        compositeDisposable?.add(getSingle())
     }
 
 
-    fun getSingle(): Disposable {
+    private fun getSingle(): Disposable {
         return NetworkClient.networkService()
-                .getMovies()
+                .getMovies(pageCount)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ response ->
+                    view.showLoader(false)
+                    (this::handleSuccess)(response)
                 },
-                        { error -> error.printStackTrace() });
+                        { error ->
+                            view.showLoader(false)
+                            error.printStackTrace()
+                        })
 
     }
 
+
+    private fun handleSuccess(responseBody: ResponseBody) {
+        ++pageCount
+        val movieList: MutableList<Movie> = ArrayList()
+        val jsonObject = JSONObject(responseBody.string())
+        val data = jsonObject.getJSONObject("data")
+        val movies = data.getJSONArray("movies")
+        val length = movies.length()
+        for (i in 0 until (length - 1)) {
+            val movie = movies.getJSONObject(i)
+            movieList.add(Movie(movie.getString("title"), movie.getString("large_cover_image"),
+                    movie.getString("year"), movie.getString("summary")))
+        }
+        view.addMovieData(movieList)
+    }
 
 }

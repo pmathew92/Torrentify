@@ -10,7 +10,8 @@ import prince.com.torrentify.GlideApp
 import prince.com.torrentify.R
 import prince.com.torrentify.model.Movie
 
-class TorrentAdapter(val movieList: List<Movie>, val context: Context) : RecyclerView.Adapter<TorrentAdapter.MovieHolder>() {
+class TorrentAdapter(val context: Context) : RecyclerView.Adapter<TorrentAdapter.MovieHolder>() {
+    private var movieList: MutableList<Movie> = ArrayList()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieHolder {
         val view: View = LayoutInflater.from(context).inflate(R.layout.layout_movie_card, parent, false)
         return MovieHolder(view)
@@ -19,7 +20,7 @@ class TorrentAdapter(val movieList: List<Movie>, val context: Context) : Recycle
     override fun getItemCount(): Int = movieList.size
 
     override fun onBindViewHolder(holder: MovieHolder, position: Int) {
-        val model: Movie = movieList.get(position)
+        val model: Movie = movieList[position]
         holder.movieName.text = model.name
         holder.year.text = model.year
         holder.summary.text = model.summary
@@ -27,6 +28,11 @@ class TorrentAdapter(val movieList: List<Movie>, val context: Context) : Recycle
                 .load(model.image)
                 .centerCrop()
                 .into(holder.movieImage)
+    }
+
+    fun addData(movieList: MutableList<Movie>) {
+        this.movieList.addAll(movieList)
+        notifyDataSetChanged()
     }
 
     class MovieHolder(v: View) : RecyclerView.ViewHolder(v) {
