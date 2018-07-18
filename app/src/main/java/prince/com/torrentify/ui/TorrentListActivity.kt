@@ -30,6 +30,10 @@ class TorrentListActivity : AppCompatActivity(), TorrentListContract.TorrentList
 
         presenter.subscribe()
 
+        btn_retry.setOnClickListener {
+            presenter.getTorrentList()
+        }
+
     }
 
 
@@ -46,6 +50,12 @@ class TorrentListActivity : AppCompatActivity(), TorrentListContract.TorrentList
         }
     }
 
+    override fun showError(status: Boolean, error:String?) {
+        when (status) {
+            true -> displayError(error)
+            else -> hideError()
+        }
+    }
 
     override fun addMovieData(movieList: MutableList<Movie>) {
         mAdapter?.addData(movieList)
@@ -60,8 +70,9 @@ class TorrentListActivity : AppCompatActivity(), TorrentListContract.TorrentList
     }
 
 
-    private fun showError() {
+    private fun displayError(errorMessage:String?) {
         layout_error.visibility = VISIBLE
+        txt_error.text=errorMessage
     }
 
     private fun hideError() {

@@ -8,6 +8,7 @@ interface TorrentListContract {
 
     interface TorrentListView:BaseView<TorrentListPresenter> {
         fun showLoader(status:Boolean)
+        fun showError(status: Boolean,error:String?)
         fun addMovieData(movieList:MutableList<Movie>)
     }
 

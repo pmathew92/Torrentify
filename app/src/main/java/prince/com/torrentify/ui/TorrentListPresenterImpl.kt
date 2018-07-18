@@ -31,11 +31,12 @@ class TorrentListPresenterImpl(val view: TorrentListContract.TorrentListView)
 
     override fun getTorrentList() {
         view.showLoader(true)
-        compositeDisposable?.add(getSingle())
+        view.showError(false,null)
+        compositeDisposable?.add(fetchMovieList())
     }
 
 
-    private fun getSingle(): Disposable {
+    private fun fetchMovieList(): Disposable {
         return NetworkClient.networkService()
                 .getMovies(pageCount)
                 .subscribeOn(Schedulers.io())
@@ -46,6 +47,7 @@ class TorrentListPresenterImpl(val view: TorrentListContract.TorrentListView)
                 },
                         { error ->
                             view.showLoader(false)
+                            view.showError(true,error.localizedMessage)
                             error.printStackTrace()
                         })
 
